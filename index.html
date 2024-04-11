@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>genretime</title>
+</head>
+<body>
+    <h1>genretime</h1>
+    
+    <input type="file" id="csvFileInput">
+    <button onclick="handleFileUpload()">upload csv</button>
+    <div id="progressBar" style="width: 100%; height: 20px; background-color: lightgray;">
+        <div id="progress" style="height: 100%; background-color: green; width: 0;"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script> 
+    <script src="parser.js"></script>
+    <!-- put both scripts on cdn -->
+</body>
+</html>
