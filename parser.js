@@ -16,8 +16,6 @@ function handleFileUpload() {
     }
 }
 
-
-
 function parseCSV(csvText) {
     const parsedData = Papa.parse(csvText, { header: true });
     return parsedData.data;
