@@ -1,21 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>genretime</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Electron Spotify App</title>
 </head>
 <body>
-    <h1>genretime</h1>
-    
-    <input type="file" id="csvFileInput">
-    <button onclick="handleFileUpload()">upload csv</button>
-    <div id="progressBar" style="width: 100%; height: 20px; background-color: lightgray;">
-        <div id="progress" style="height: 100%; background-color: green; width: 0;"></div>
-    </div>
+  <h1>Electron Spotify App</h1>
+  <label for="clientId">Client ID:</label>
+  <input type="text" id="clientId" name="clientId">
+  <br>
+  <label for="clientSecret">Client Secret:</label>
+  <input type="text" id="clientSecret" name="clientSecret">
+  <br>
+  <button onclick="loginWithSpotify()">Login with Spotify</button>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script> 
-    <script src="parser.js"></script>
-    <!-- put both scripts on cdn -->
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    function loginWithSpotify() {
+      const clientId = document.getElementById('clientId').value;
+      const clientSecret = document.getElementById('clientSecret').value;
+
+      ipcRenderer.send('spotifyCredentials', { clientId, clientSecret });
+    }
+
+    ipcRenderer.on('authenticated', () => {
+      // Handle authentication success, e.g., navigate to another page
+      console.log('Authentication successful');
+    });
+  </script>
 </body>
 </html>

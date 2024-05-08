@@ -1,0 +1,15 @@
+{
+  "name": "genretime",
+  "version": "1.0.0",
+  "description": "",
+  "main": "parser.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^30.0.2",
+    "spotify-web-api-node": "^5.0.2"
+  }
+}
