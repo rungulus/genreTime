@@ -1,4 +1,3 @@
-node_modules
 package-lock.json
-package_lock.json
-config.js.sample
+node_modules
+config.js

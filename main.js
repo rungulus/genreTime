@@ -1,67 +1,63 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+// main.js
+const { app, BrowserWindow, ipcMain } = require('electron')
 const SpotifyWebApi = require('spotify-web-api-node');
+const electronOauth2 = require('electron-oauth2');
+const config = require('./config');
+const fs = require('fs');
 
-let mainWindow;
+let mainWindow
 
-function createWindow() {
-    console.log('making window');
- const  win = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      nodeIntegration: true
-    }
-  });
-
-  win.loadFile('index.html');
-
-  // Open DevTools
-  // mainWindow.webContents.openDevTools();
-}
-
-app.whenReady().then(() => {
-    createWindow()
-  })
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
+function createWindow () {
+  if (mainWindow) {
+    return;
   }
-});
 
-app.on('activate', () => {
-  if (mainWindow === null) {
-    createWindow();
-  }
-});
-
-// Handle authentication callback
-app.on('login', (event, callbackURL) => {
-    console.log('handling auth');
-  const url = new URL(callbackURL);
-  const code = url.searchParams.get('code');
-
-  // Use the code to get access token
-  spotifyApi.authorizationCodeGrant(code).then(data => {
-    const { access_token, refresh_token } = data.body;
-    spotifyApi.setAccessToken(access_token);
-    spotifyApi.setRefreshToken(refresh_token);
-    mainWindow.webContents.send('authenticated');
-  }).catch(err => {
-    console.error('Error authenticating with Spotify:', err);
-  });
-});
-
-// Receive client ID and client secret from renderer process
-ipcMain.on('spotifyCredentials', (event, credentials) => {
-  const { clientId, clientSecret } = credentials;
-  const redirectUri = 'http://localhost:8888/callback'; // Should match the redirectUri in your Electron main process
+  mainWindow = new BrowserWindow({width: 800, height: 600})
 
   const spotifyApi = new SpotifyWebApi({
-    clientId,
-    clientSecret,
-    redirectUri
+    clientId: config.spotify.clientId,
+    clientSecret: config.spotify.clientSecret,
+    redirectUri: config.spotify.redirectUri
   });
 
-  // Save spotifyApi object for future use, e.g., make API requests
-});
+  const windowParams = {
+    alwaysOnTop: true,
+    autoHideMenuBar: true,
+    webPreferences: {
+      nodeIntegration: false
+    }
+  }
+
+  const options = {
+    scope: 'user-read-recently-played',
+    showDialog: true
+  }
+
+  const spotifyOauth = electronOauth2(windowParams, options);
+
+  spotifyOauth.getAccessToken({})
+  .then(token => {
+    spotifyApi.setAccessToken(token.access_token);
+
+    mainWindow.webContents.send('fetching-history');
+
+    spotifyApi.getMyRecentlyPlayedTracks({})
+      .then(data => {
+        fs.writeFile('listening_history.json', JSON.stringify(data.body), err => {
+          if (err) console.error('Error writing file:', err);
+          mainWindow.webContents.send('history-fetched');
+        });
+      })
+      .catch(err => {
+        console.error('Something went wrong:', err);
+      });
+  });
+
+mainWindow.loadFile('index.html')
+
+mainWindow.on('closed', function () {
+  mainWindow = null
+})
+}
+
+app.on('ready', createWindow)

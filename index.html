@@ -1,34 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Electron Spotify App</title>
-</head>
-<body>
-  <h1>Electron Spotify App</h1>
-  <label for="clientId">Client ID:</label>
-  <input type="text" id="clientId" name="clientId">
-  <br>
-  <label for="clientSecret">Client Secret:</label>
-  <input type="text" id="clientSecret" name="clientSecret">
-  <br>
-  <button onclick="loginWithSpotify()">Login with Spotify</button>
+<html>
+  <head>
+    <title>Spotify Authentication</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: Arial, sans-serif;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        width: 300px;
+      }
+      input {
+        margin-bottom: 10px;
+        padding: 10px;
+        font-size: 16px;
+      }
+      button {
+        padding: 10px;
+        font-size: 16px;
+        background-color: #1db954;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #1ed760;
+      }
+    </style>
+  </head>
+  <body>
+    <form id="spotify-auth-form">
+      <input
+        type="text"
+        id="client-id"
+        placeholder="Spotify Client ID"
+        required
+      />
+      <input
+        type="text"
+        id="client-secret"
+        placeholder="Spotify Client Secret"
+        required
+      />
+      <button type="submit">Submit</button>
+    </form>
 
-  <script>
-    const { ipcRenderer } = require('electron');
+    <script>
+      document
+        .getElementById("spotify-auth-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          const clientId = document.getElementById("client-id").value;
+          const clientSecret = document.getElementById("client-secret").value;
+          // You can use the ipcRenderer module to send these values to the main process
+        });
+      const { ipcRenderer } = require("electron");
 
-    function loginWithSpotify() {
-      const clientId = document.getElementById('clientId').value;
-      const clientSecret = document.getElementById('clientSecret').value;
+      ipcRenderer.on("fetching-history", () => {
+        // Update the UI to indicate that the listening history is being fetched
+      });
 
-      ipcRenderer.send('spotifyCredentials', { clientId, clientSecret });
-    }
-
-    ipcRenderer.on('authenticated', () => {
-      // Handle authentication success, e.g., navigate to another page
-      console.log('Authentication successful');
-    });
-  </script>
-</body>
+      ipcRenderer.on("history-fetched", () => {
+        // Update the UI to indicate that the listening history has been fetched
+      });
+    </script>
+  </body>
 </html>
